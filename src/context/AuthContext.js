@@ -81,6 +81,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AUTH_API } from '../api/apiEndpoints';
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -93,14 +94,15 @@ export const AuthProvider = ({ children }) => {
       fetchUserProfile(token);
     }
   }, []);
+
   const fetchUserProfile = async (token) => {
     try {
       const response = await axios.get(AUTH_API.PROFILE, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      setUser(response.data);
+      setUser(response.data.user || response.data); // handle both cases
     } catch (error) {
       console.error('Error fetching profile:', error);
       localStorage.removeItem('token');
@@ -110,31 +112,30 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('/api/v1/auth/login', { username, password });
+      const response = await axios.post(AUTH_API.LOGIN, { username, password });
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       navigate('/');
-      window.location.reload(); 
+      window.location.reload();
     } catch (error) {
       throw error;
     }
   };
 
-
   const signup = async (username, password) => {
-      try {
-        const response = await axios.post('/api/v1/auth/signup', { username, password });
-        console.log('Signup response:', response);
-        navigate('/login'); // Optional — you could move this to component
-        return { success: true };
-      } catch (error) {
-        console.error('Error during signup:', error);
-        if (error.response && error.response.status === 409) {
-          return { success: false, message: 'User already exists.' };
-        }
-        return { success: false, message: 'Signup failed. Please try again.' };
+    try {
+      const response = await axios.post(AUTH_API.SIGNUP, { username, password });
+      console.log('Signup response:', response);
+      navigate('/login');
+      return { success: true };
+    } catch (error) {
+      console.error('Error during signup:', error);
+      if (error.response && error.response.status === 409) {
+        return { success: false, message: 'User already exists.' };
       }
-    };
+      return { success: false, message: 'Signup failed. Please try again.' };
+    }
+  };
 
   const signOut = () => {
     localStorage.removeItem('token');
@@ -144,7 +145,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, signup, signOut }}>
-     {children}
+      {children}
     </AuthContext.Provider>
   );
 };
