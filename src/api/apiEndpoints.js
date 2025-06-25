@@ -1,5 +1,4 @@
-// Define your base URL here
-const BASE_URL = "http://localhost:5000/api/v1";
+// Dynamically switch between local and deployed backend
 const API = process.env.REACT_APP_API_URL;
 
 // Auth endpoints
@@ -11,15 +10,14 @@ export const AUTH_API = {
 
 // Income endpoints
 export const INCOME_API = {
-    ADD: `${BASE_URL}/add-income`,
-    GET: `${BASE_URL}/get-incomes`,
-    DELETE: (id) => `${BASE_URL}/delete-income/${id}`, // Use function for dynamic segments
+  ADD: `${API}/api/v1/add-income`,
+  GET: `${API}/api/v1/get-incomes`,
+  DELETE: (id) => `${API}/api/v1/delete-income/${id}`,
 };
 
 // Expense endpoints
 export const EXPENSE_API = {
-    ADD: `${BASE_URL}/add-expense`,
-    GET: `${BASE_URL}/get-expenses`,
-    DELETE: (id) => `${BASE_URL}/delete-expense/${id}`, // Use function for dynamic segments
+  ADD: `${API}/api/v1/add-expense`,
+  GET: `${API}/api/v1/get-expenses`,
+  DELETE: (id) => `${API}/api/v1/delete-expense/${id}`,
 };
-
